@@ -214,16 +214,6 @@
         <pre class="text-xs text-gray-500 mt-2">DEBUG: {{ $secretMessage }}</pre>
     @endif
 
-    @if (session('toastMessage'))
-        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)" x-transition.opacity.duration.500ms
-            class="fixed inset-0 flex items-center justify-center z-[9999]">
-            <div
-                class="px-4 py-2 rounded-lg shadow-lg text-white text-sm
-            {{ session('toastType') === 'success' ? 'bg-green-600' : 'bg-red-600' }}">
-                {{ session('toastMessage') }}
-            </div>
-        </div>
-    @endif
 
 
 

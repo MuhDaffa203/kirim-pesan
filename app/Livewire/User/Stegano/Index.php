@@ -56,7 +56,6 @@ class Index extends Component
             $this->dispatch('stegoImageReady', ['url' => asset('storage/' . $outputPath)]);
             $this->dispatch('toast', ['type' => 'success', 'message' => 'Pesan berhasil disisipkan ke gambar!']);
         } catch (\Throwable $e) {
-            Log::error('❌ [ENCRYPT] Gagal embed gambar PVD', ['error' => $e->getMessage()]);
             $this->dispatch('toast', ['type' => 'error', 'message' => 'Terjadi kesalahan saat menyembunyikan pesan.']);
         }
     }
@@ -77,7 +76,6 @@ class Index extends Component
 
             $this->dispatch('toast', ['type' => 'success', 'message' => 'Pesan berhasil diambil dari gambar!']);
         } catch (\Throwable $e) {
-            Log::error('❌ [DECRYPT] Gagal ekstrak pesan', ['error' => $e->getMessage()]);
             $this->dispatch('toast', ['type' => 'error', 'message' => 'Gagal mendekripsi gambar.']);
         }
     }

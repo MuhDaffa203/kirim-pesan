@@ -75,25 +75,21 @@ class Index extends Component
                 $outputPath = $baseDir . DIRECTORY_SEPARATOR . 'stego_' . $safeName;
                 $pvd = new \App\Services\Encryption\PvdSteganography();
                 $pvd->embedMessage($tempPath, $this->secretMessage, $outputPath);
-                Log::info('🧩 [STEGANO] Pesan rahasia disisipkan.', ['file' => $outputPath]);
 
                 $path = 'chat/files/stego_' . $safeName;
                 @unlink($tempPath); // hapus file tmp
             }
-            // 📁 Jika file bukan gambar → lakukan enkripsi TripleDES
+            // Jika file bukan gambar → lakukan enkripsi TripleDES
             elseif (!$isImage) {
                 $encryptor = new \App\Services\Encryption\FileTripleDESEncryptor();
                 $encryptedPath = $baseDir . DIRECTORY_SEPARATOR . 'enc_' . $safeName;
                 $encryptor->encryptFile($tempPath, $encryptedPath);
-                Log::info('🔐 [ENCRYPT] File terenkripsi disimpan.', ['file' => $encryptedPath]);
-
                 $path = 'chat/files/enc_' . $safeName;
                 @unlink($tempPath);
             }
-            // 📸 Jika gambar tanpa pesan rahasia
+            //  Jika gambar tanpa pesan rahasia
             else {
                 $this->file->storeAs('chat/files', $safeName, 'public');
-                Log::info('🖼 [IMAGE] Gambar disimpan tanpa enkripsi.', ['file' => $safeName]);
                 $path = 'chat/files/' . $safeName;
             }
         }
@@ -145,20 +141,16 @@ class Index extends Component
     public function decryptStegoMessage($filePath)
     {
         try {
-            Log::info('🧩 [DECRYPT] Mulai ekstraksi pesan...', ['filePath' => $filePath]);
 
             $inputPath = storage_path('app/public/chat/files/' . basename($filePath));
             $extension = strtolower(pathinfo($inputPath, PATHINFO_EXTENSION));
 
             if (!file_exists($inputPath)) {
-                Log::error('❌ [DECRYPT] File tidak ditemukan.', ['expected' => $inputPath]);
                 throw new \Exception('File tidak ditemukan di lokasi yang diharapkan.');
             }
 
             // Jika gambar
             if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'])) {
-                Log::info('🖼 [DECRYPT] File gambar terdeteksi, langsung proses steganografi.');
-
                 $pvd = new \App\Services\Encryption\PvdSteganography();
                 $message = $pvd->extractMessage($inputPath);
 
@@ -167,23 +159,17 @@ class Index extends Component
                 }
 
                 $this->secretMessage = $message;
-                Log::info('✅ [DECRYPT] Pesan rahasia berhasil diekstrak.');
-                Log::info('🧠 [DEBUG] secretMessage diset: ' . substr($message, 0, 100));
-
-                // 🧩 Paksa Livewire update DOM (bukan $refresh)
                 $this->dispatch('showSecretMessage');
 
                 return;
             }
 
             // Jika bukan gambar
-            Log::info('🔐 [DECRYPT] File bukan gambar, mulai proses dekripsi.');
             $decryptor = new \App\Services\Encryption\FileTripleDESEncryptor();
             $tmpOutput = storage_path('app/public/chat/tmp/dec_' . basename($filePath));
             $decryptor->decryptFile($inputPath, $tmpOutput);
-            Log::info('✅ [DECRYPT] File berhasil didekripsi.', ['output' => $tmpOutput]);
+            
         } catch (\Throwable $e) {
-            Log::error('❌ [DECRYPT] Gagal mengekstrak pesan.', ['error' => $e->getMessage()]);
             $this->dispatch('toast', [
                 'type' => 'error',
                 'message' => 'Gagal mengekstrak pesan!'
@@ -194,30 +180,12 @@ class Index extends Component
     public function showImage($messageId)
     {
         $message = Message::find($messageId);
-
-        if (!$message || !$message->file_path) {
-            Log::warning('⚠️ [PREVIEW] Gagal: pesan/file_path tidak ditemukan.', [
-                'id' => $messageId,
-            ]);
-            return;
-        }
-
         $absolutePath = storage_path('app/public/' . $message->file_path);
-
-        if (!file_exists($absolutePath)) {
-            Log::error('❌ [PREVIEW] File tidak ditemukan di storage.', ['path' => $absolutePath]);
-            return;
-        }
-
         $publicUrl = asset('storage/' . $message->file_path);
 
         $this->previewImage = $publicUrl;
         $this->showImageModal = true;
 
-        Log::info('🖼 [PREVIEW] Gambar siap ditampilkan.', [
-            'id' => $messageId,
-            'url' => $publicUrl,
-        ]);
     }
 
 
@@ -250,13 +218,6 @@ class Index extends Component
 
         $this->resetErrorBag();
         $this->resetValidation();
-
-        // kirim event toast langsung tanpa session
-        $this->dispatch('toast', [
-            'type' => 'success',
-            'message' => 'Pesan berhasil dihapus!'
-        ]);
-
         $this->dispatch('messageDeleted');
     }
 
