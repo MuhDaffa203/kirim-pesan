@@ -51,13 +51,6 @@
                     name="remember">
                 <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
             </label>
-
-            @if (Route::has('password.request'))
-                <a class="text-sm text-indigo-600 hover:text-indigo-800 transition font-medium"
-                    href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
         </div>
 
         <!-- Full-width Button -->
