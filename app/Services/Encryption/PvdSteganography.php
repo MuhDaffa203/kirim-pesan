@@ -41,14 +41,10 @@ class PvdSteganography
             }
         }
 
-        // ✅ Simpan sebagai PNG (lossless)
+
         imagepng($img, $outputPath);
         imagedestroy($img);
 
-        Log::info('✅ [STEGO] Pesan rahasia berhasil disisipkan ke gambar.', [
-            'output' => $outputPath,
-            'encoded_length' => strlen($encodedMessage)
-        ]);
     }
 
     public function extractMessage($imagePath)
@@ -71,18 +67,11 @@ class PvdSteganography
         $chars = str_split($binary, 8);
         $raw = '';
         foreach ($chars as $bin) {
-            if ($bin === '00000011') break; // EOF marker
+            if ($bin === '00000011') break; 
             $raw .= chr(bindec($bin));
         }
 
-        // ✅ Decode dari Base64
         $decoded = base64_decode($raw, true);
-
-        if ($decoded === false) {
-            Log::warning('⚠️ [STEGO] Gagal decode base64, menampilkan raw data.');
-            return $raw;
-        }
-
         return $decoded;
     }
 }

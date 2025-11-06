@@ -32,7 +32,7 @@ class FileTripleDESEncryptor
 
         $cipher->setKey($this->key);
         $cipher->setIV($iv);
-        $cipher->disablePadding(); // ⛔ penting untuk file biner
+        $cipher->disablePadding(); 
 
         $plaintext = file_get_contents($inputPath);
         if ($plaintext === false) {
@@ -66,7 +66,7 @@ class FileTripleDESEncryptor
         $cipher = new TripleDES('cbc');
         $cipher->setKey($this->key);
         $cipher->setIV($iv);
-        $cipher->disablePadding(); // ⛔ sama seperti saat enkripsi
+        $cipher->disablePadding();
 
         $plaintext = $cipher->decrypt($ciphertext);
         // Hilangkan padding null

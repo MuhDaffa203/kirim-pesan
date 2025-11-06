@@ -19,7 +19,7 @@ class Message extends Model
         'is_read',
     ];
 
-    // 🔒 Enkripsi otomatis saat diset
+
     public function setContentAttribute($value)
     {
         if (!empty($value)) {
@@ -28,7 +28,6 @@ class Message extends Model
         }
     }
 
-    // 🔓 Dekripsi otomatis saat diambil
     public function getContentAttribute($value)
     {
         if (empty($value)) {

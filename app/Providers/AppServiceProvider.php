@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Hash;
+use App\Hashing\CryptHasher;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -11,7 +13,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Daftar hasher custom
+
     }
 
     /**
@@ -20,5 +23,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         //
+        Hash::extend('crypt', function () {
+            return new CryptHasher;
+        });
     }
 }

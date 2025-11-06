@@ -21,7 +21,7 @@ class Index extends Component
 
 
     /**
-     * 🔒 Enkripsi & sisipkan pesan ke gambar
+     * Enkripsi & sisipkan pesan ke gambar
      */
     public function encryptImage()
     {
@@ -31,15 +31,9 @@ class Index extends Component
         ]);
 
         try {
-            Log::info('🟢 [ENCRYPT] Mulai proses embed...');
-
-            // 1️⃣ Simpan gambar cover ke storage
+ 
             $path = $this->coverImage->store('stegano/original', 'public');
-
-            // 2️⃣ Tentukan path hasil output
             $outputPath = 'stegano/output/stego_' . basename($path);
-
-            // 3️⃣ Jalankan proses embed PVD
             $pvd = new PvdSteganography();
             $pvd->embedMessage(
                 storage_path('app/public/' . $path),

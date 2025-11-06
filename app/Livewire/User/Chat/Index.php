@@ -81,12 +81,25 @@ class Index extends Component
             }
             // Jika file bukan gambar → lakukan enkripsi TripleDES
             elseif (!$isImage) {
-                $encryptor = new \App\Services\Encryption\FileTripleDESEncryptor();
+                $extension = strtolower($this->file->getClientOriginalExtension());
                 $encryptedPath = $baseDir . DIRECTORY_SEPARATOR . 'enc_' . $safeName;
+
+                // 🔹 Jika file database → AES-256-CBC
+                $dbExtensions = ['sql', 'sqlite', 'db', 'sql.gz', 'sqlite3'];
+                if (in_array($extension, $dbExtensions)) {
+                    $encryptor = new \App\Services\Encryption\FileAESEncryptor();
+                }
+                // 🔹 Selain itu (pdf, docx, zip, dll) → TripleDES
+                else {
+                    $encryptor = new \App\Services\Encryption\FileTripleDESEncryptor();
+                }
+
                 $encryptor->encryptFile($tempPath, $encryptedPath);
                 $path = 'chat/files/enc_' . $safeName;
+
                 @unlink($tempPath);
             }
+
             //  Jika gambar tanpa pesan rahasia
             else {
                 $this->file->storeAs('chat/files', $safeName, 'public');
@@ -129,7 +142,16 @@ class Index extends Component
         $safeOriginal = str_replace('enc_', '', $fileName);
         $decryptedPath = $tmpDir . DIRECTORY_SEPARATOR . $safeOriginal;
 
-        $decryptor = new FileTripleDESEncryptor();
+        $extension = strtolower(pathinfo($safeOriginal, PATHINFO_EXTENSION));
+
+        // 🔹 Tentukan algoritma yang digunakan
+        $dbExtensions = ['sql', 'sqlite', 'db', 'sql.gz', 'sqlite3'];
+        if (in_array($extension, $dbExtensions)) {
+            $decryptor = new \App\Services\Encryption\FileAESEncryptor();
+        } else {
+            $decryptor = new \App\Services\Encryption\FileTripleDESEncryptor();
+        }
+
         $decryptor->decryptFile($encryptedPath, $decryptedPath);
 
         $mime = mime_content_type($decryptedPath) ?: 'application/octet-stream';
@@ -168,7 +190,6 @@ class Index extends Component
             $decryptor = new \App\Services\Encryption\FileTripleDESEncryptor();
             $tmpOutput = storage_path('app/public/chat/tmp/dec_' . basename($filePath));
             $decryptor->decryptFile($inputPath, $tmpOutput);
-            
         } catch (\Throwable $e) {
             $this->dispatch('toast', [
                 'type' => 'error',
@@ -185,7 +206,6 @@ class Index extends Component
 
         $this->previewImage = $publicUrl;
         $this->showImageModal = true;
-
     }
 
 

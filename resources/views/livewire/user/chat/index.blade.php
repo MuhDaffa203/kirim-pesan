@@ -213,9 +213,4 @@
     @if ($secretMessage)
         <pre class="text-xs text-gray-500 mt-2">DEBUG: {{ $secretMessage }}</pre>
     @endif
-
-
-
-
-
 </div>
